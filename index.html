@@ -9,5 +9,17 @@
 	</head>
 	<body>
 		<p>Tic Tac Toe</p>
+		<dialog open>
+			<p>Enter Player Names</p>
+			<form method="dialog">
+				<label for="p1"
+					><input type="text" id="p1" placeholder="Player-1's name" required
+				/></label>
+				<label for="p2"
+					><input type="text" id="p2" placeholder="Player-2's name" required
+				/></label>
+				<button onclick="getNames()">OK</button>
+			</form>
+		</dialog>
 	</body>
 </html>

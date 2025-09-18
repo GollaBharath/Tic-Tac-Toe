@@ -80,15 +80,14 @@ function Player(name) {
 	return { name, getScore, incrementScore };
 }
 
-let gameEngine = (function () {
-	let player1 = Player(prompt("Enter player 1 name"));
-	let player2 = Player(prompt("Enter player 2 name"));
-
+function gameEngine(Player1, Player2) {
+	let player1 = Player(Player1);
+	let player2 = Player(Player2);
 	while (player1.getScore() < 3 && player2.getScore() < 3) {
 		gameBoard.reset();
 		playRound(player1, player2);
 	}
-})();
+}
 
 function playRound(Player1, Player2) {
 	while (gameBoard.checkWin()) {
@@ -121,4 +120,11 @@ function mark() {
 	}
 	gameBoard.markCell(x, y, p);
 	console.log(gameBoard.showBoard());
+}
+
+// GUI
+function getNames() {
+	const Player1 = document.querySelector("#p1").value;
+	const Player2 = document.querySelector("#p2").value;
+	gameEngine(Player1, Player2);
 }
