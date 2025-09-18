@@ -2,6 +2,8 @@ let gameBoard = (function () {
 	// 0 - not filled
 	// 1 - X
 	// -1 - O
+	let isFull = false;
+	let p1turn = true;
 	let board = [
 		[0, 0, 0],
 		[0, 0, 0],
@@ -10,8 +12,11 @@ let gameBoard = (function () {
 	let markCell = (x, y, p) => {
 		if (board[x][y] == 0) {
 			board[x][y] = p;
+			p1turn = !p1turn;
+			isFull = false;
 		}
 	};
+
 	let checkWin = () => {
 		if (
 			board[0][0] != 0 &&
@@ -27,7 +32,7 @@ let gameBoard = (function () {
 		) {
 			return false;
 		}
-		for (x = 0; x < 3; x++) {
+		for (let x = 0; x < 3; x++) {
 			if (
 				board[x][0] != 0 &&
 				board[x][0] == board[x][1] &&
@@ -43,7 +48,18 @@ let gameBoard = (function () {
 				return false;
 			}
 		}
-
+		let tie = true;
+		for (let x = 0; x < 3; x++) {
+			for (let y = 0; y < 3; y++) {
+				if (board[x][y] == 0) {
+					tie = false;
+				}
+			}
+		}
+		if (tie) {
+			isFull = true;
+			alert("This round is a tie. Play Again!!!");
+		}
 		return true;
 	};
 	let reset = () => {
@@ -54,7 +70,7 @@ let gameBoard = (function () {
 		];
 	};
 	let showBoard = () => board;
-	return { markCell, showBoard, checkWin, reset };
+	return { markCell, showBoard, checkWin, reset, isFull, p1turn };
 })();
 
 function Player(name) {
@@ -68,38 +84,35 @@ let gameEngine = (function () {
 	let player1 = Player(prompt("Enter player 1 name"));
 	let player2 = Player(prompt("Enter player 2 name"));
 
-	let p1turn = true;
-
 	while (player1.getScore() < 3 && player2.getScore() < 3) {
 		gameBoard.reset();
-		playRound(player1, player2, p1turn);
+		playRound(player1, player2);
 	}
 })();
 
-function playRound(Player1, Player2, p1turn) {
+function playRound(Player1, Player2) {
 	while (gameBoard.checkWin()) {
-		mark(p1turn);
-		if (gameBoard.checkWin() == false) {
-			if (p1turn) {
-				Player1.incrementScore();
-				var winner = Player1.name;
-			} else {
-				Player2.incrementScore();
-				var winner = Player2.name;
+		if (!gameBoard.isFull) {
+			mark();
+			if (gameBoard.checkWin() == false) {
+				if (!gameBoard.p1turn) {
+					Player1.incrementScore();
+					var winner = Player1.name;
+				} else {
+					Player2.incrementScore();
+					var winner = Player2.name;
+				}
+				alert(winner + " has Won this round.");
+				alert("Scores : " + Player1.getScore() + " <-> " + Player2.getScore());
 			}
-			console.log(winner + " has Won this round.");
-			console.log(
-				"Scores : " + Player1.getScore() + " <-> " + Player2.getScore()
-			);
-			alert(winner + "has Won this round.");
+		} else {
 			alert("Scores : " + Player1.getScore() + " <-> " + Player2.getScore());
 		}
-		p1turn = !p1turn;
 	}
 }
 
-function mark(p1turn) {
-	if (p1turn) {
+function mark() {
+	if (gameBoard.p1turn) {
 		var p = -1;
 		var [x, y] = prompt("player 1 marks in :").split(" ").map(Number);
 	} else {
