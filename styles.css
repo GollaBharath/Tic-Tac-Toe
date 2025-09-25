@@ -1,0 +1,12 @@
+.board {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr 1fr;
+}
+
+.cell {
+	min-width: 50px;
+	min-height: 50px;
+	border: 2px solid black;
+	margin: 1px;
+}
