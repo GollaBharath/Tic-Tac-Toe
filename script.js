@@ -131,6 +131,8 @@ function gameEngine(Player1, Player2, p1turn) {
 
 // GUI
 function getNames() {
+	const dialog = document.querySelector("#nameDialog");
+	dialog.showModal();
 	const Player1 = document.querySelector("#p1").value;
 	const Player2 = document.querySelector("#p2").value;
 	document.querySelector("#p1name").textContent = Player1 + " : O";
