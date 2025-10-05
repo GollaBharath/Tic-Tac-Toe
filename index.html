@@ -8,6 +8,54 @@
 		<script src="./script.js" defer></script>
 	</head>
 	<body>
-		<p>Tic Tac Toe</p>
+		<header>Tic-Tac-Toe</header>
+		<main>
+			<div class="player1">
+				<p id="p1name"></p>
+				<p id="p1score"></p>
+			</div>
+			<div class="game">
+				<div class="board">
+					<div class="cell" data="0 0"><p></p></div>
+					<div class="cell" data="0 1"><p></p></div>
+					<div class="cell" data="0 2"><p></p></div>
+					<div class="cell" data="1 0"><p></p></div>
+					<div class="cell" data="1 1"><p></p></div>
+					<div class="cell" data="1 2"><p></p></div>
+					<div class="cell" data="2 0"><p></p></div>
+					<div class="cell" data="2 1"><p></p></div>
+					<div class="cell" data="2 2"><p></p></div>
+				</div>
+			</div>
+			<div class="player2">
+				<p id="p2name"></p>
+				<p id="p2score"></p>
+			</div>
+		</main>
+		<dialog id="nameDialog">
+			<p>Enter Player Names</p>
+			<form method="dialog">
+				<div class="inps">
+					<label for="p1"
+						><input type="text" id="p1" placeholder="Player-1's name" required
+					/></label>
+					<label for="p2"
+						><input type="text" id="p2" placeholder="Player-2's name" required
+					/></label>
+				</div>
+
+				<button onclick="gameEngine()">START</button>
+			</form>
+		</dialog>
+		<dialog id="winner">
+			<p id="winnerText"></p>
+			<button onclick="closeWD()">OK</button>
+		</dialog>
+		<dialog id="final">
+			<form method="dialog">
+				<p id="finalText"></p>
+				<button onclick="closeFD()">Play Again</button>
+			</form>
+		</dialog>
 	</body>
 </html>
