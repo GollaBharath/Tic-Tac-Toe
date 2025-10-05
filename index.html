@@ -44,7 +44,17 @@
 					/></label>
 				</div>
 
-				<button onclick="getNames()">START</button>
+				<button onclick="gameEngine()">START</button>
+			</form>
+		</dialog>
+		<dialog id="winner">
+			<p id="winnerText"></p>
+			<button onclick="closeWD()">OK</button>
+		</dialog>
+		<dialog id="final">
+			<form method="dialog">
+				<p id="finalText"></p>
+				<button onclick="closeFD()">Play Again</button>
 			</form>
 		</dialog>
 	</body>

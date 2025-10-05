@@ -1,3 +1,6 @@
+const dialog = document.querySelector("#nameDialog");
+dialog.showModal();
+
 let gameBoard = (function () {
 	// 0 - not filled
 	// 1 - X
@@ -14,11 +17,14 @@ let gameBoard = (function () {
 			[0, 0, 0],
 			[0, 0, 0],
 		];
+		console.log(board);
 	};
-	let showBoard = (p1, p2) => {
-		displayBoard(board, p1, p2);
+
+	let showBoard = () => {
+		displayBoard(board);
 		return board;
 	};
+
 	let isFull = () => {
 		for (let i = 0; i < 3; i++) {
 			for (let j = 0; j < 3; j++) {
@@ -29,6 +35,7 @@ let gameBoard = (function () {
 		}
 		return true;
 	};
+
 	let markCell = (x, y, p) => {
 		if (board[x][y] != 0) {
 			return false;
@@ -37,6 +44,7 @@ let gameBoard = (function () {
 			return true;
 		}
 	};
+
 	let checkWin = () => {
 		for (let i = 0; i < 3; i++) {
 			if (
@@ -70,10 +78,9 @@ let gameBoard = (function () {
 		}
 		return 0;
 	};
+
 	return { showBoard, reset, isFull, markCell, checkWin };
 })();
-
-getNames();
 
 function Player(name) {
 	let score = 0;
@@ -82,74 +89,17 @@ function Player(name) {
 	return { name, getScore, incrementScore };
 }
 
-function gameEngine(Player1, Player2, p1turn) {
-	let player1 = Player(Player1);
-	let player2 = Player(Player2);
-	let cells = document.querySelectorAll(".cell");
-	cells.forEach((cell) => {
-		cell.addEventListener("click", () => {
-			let loc = cell.getAttribute("data").split(" ").map(Number);
-			if (p1turn) {
-				var p = -1;
-			} else {
-				var p = 1;
-			}
-			let c = gameBoard.markCell(loc[0], loc[1], p);
-			if (c) {
-				p1turn = !p1turn;
-				gameBoard.showBoard(player1, player2);
-				if (gameBoard.isFull()) {
-					console.log(
-						"Scores : " + player1.getScore() + " <-> " + player2.getScore()
-					);
-					gameBoard.reset();
-					console.log(gameBoard.showBoard(player1, player2));
-				} else {
-					if (player1.getScore() < 4 && player2.getScore() < 4) {
-						if (gameBoard.checkWin() == 1) {
-							player2.incrementScore();
-							gameBoard.reset();
-							gameBoard.showBoard(player1, player2);
-						} else if (gameBoard.checkWin() == -1) {
-							player1.incrementScore();
-							gameBoard.reset();
-							gameBoard.showBoard(player1, player2);
-						}
-					} else {
-						console.log(
-							"Final Scores : " +
-								player1.getScore() +
-								" <-> " +
-								player2.getScore()
-						);
-					}
-				}
-			}
-		});
-	});
-}
-
-// GUI
 function getNames() {
-	const dialog = document.querySelector("#nameDialog");
-	dialog.showModal();
-	const Player1 = document.querySelector("#p1").value;
-	const Player2 = document.querySelector("#p2").value;
-	document.querySelector("#p1name").textContent = Player1 + " : O";
-	document.querySelector("#p2name").textContent = Player2 + " : X";
-	let p1turn = true;
-	if (Math.random() > 0.5) {
-		p1turn = true;
-	} else {
-		p1turn = false;
-	}
-	gameEngine(Player1, Player2, p1turn);
+	const player1 = document.querySelector("#p1").value;
+	const player2 = document.querySelector("#p2").value;
+	document.querySelector("#p1name").textContent = player1 + " (O)";
+	document.querySelector("#p2name").textContent = player2 + " (X)";
+	let Player1 = Player(player1);
+	let Player2 = Player(player2);
+	return [Player1, Player2];
 }
 
-function displayBoard(board, p1, p2) {
-	document.querySelector("#p1score").textContent = p1.getScore();
-	document.querySelector("#p2score").textContent = p2.getScore();
-
+function displayBoard(board) {
 	let cells = document.querySelectorAll(".cell");
 	cells.forEach((cell) => {
 		cell.removeChild(cell.lastChild);
@@ -163,4 +113,111 @@ function displayBoard(board, p1, p2) {
 				: "";
 		cell.appendChild(value);
 	});
+}
+
+function updateScores(player1, player2) {
+	document.querySelector("#p1score").textContent =
+		"Score : " + player1.getScore();
+	document.querySelector("#p2score").textContent =
+		"Score : " + player2.getScore();
+}
+
+function gameEngine() {
+	let [player1, player2] = getNames();
+	let p1turn = true;
+	if (Math.random() > 0.5) {
+		p1turn = true;
+	} else {
+		p1turn = false;
+	}
+	gameBoard.showBoard();
+	updateScores(player1, player2);
+	playRound(player1, player2, p1turn);
+}
+
+function playRound(player1, player2, p1turn) {
+	let cells = document.querySelectorAll(".cell");
+	let WD = document.querySelector("#winner");
+	let FD = document.querySelector("#final");
+	let winnerText = WD.querySelector("p");
+	let finalText = FD.querySelector("p");
+	// Remove all old listeners by cloning nodes
+	cells.forEach((cell) => {
+		const newCell = cell.cloneNode(true);
+		cell.parentNode.replaceChild(newCell, cell);
+	});
+
+	cells = document.querySelectorAll(".cell");
+
+	cells.forEach((cell) => {
+		cell.addEventListener("click", () => {
+			let [x, y] = cell.getAttribute("data").split(" ").map(Number);
+			let mark = p1turn ? -1 : 1; // O -> -1, X -> 1
+
+			if (!gameBoard.markCell(x, y, mark)) {
+				return;
+			}
+
+			gameBoard.showBoard();
+
+			let winner = gameBoard.checkWin();
+
+			if (winner !== 0) {
+				if (winner === 1) {
+					player2.incrementScore();
+					console.log(`${player2.name} wins this round!`);
+					winnerText.textContent = `${player2.name} wins this round!`;
+					WD.showModal();
+				} else if (winner === -1) {
+					player1.incrementScore();
+					console.log(`${player1.name} wins this round!`);
+					winnerText.textContent = `${player1.name} wins this round!`;
+					WD.showModal();
+				}
+
+				console.log(
+					`Scores: ${player1.name} = ${player1.getScore()} | ${
+						player2.name
+					} = ${player2.getScore()}`
+				);
+				updateScores(player1, player2);
+				if (player1.getScore() >= 3 || player2.getScore() >= 3) {
+					console.log("🏆 Game Over!");
+					finalText.textContent = `🏆 Game Over!`;
+					FD.showModal();
+					return;
+				}
+
+				gameBoard.reset();
+				gameBoard.showBoard();
+				playRound(player1, player2, !p1turn);
+				return;
+			}
+
+			// Draw check
+			if (gameBoard.isFull()) {
+				console.log("Round Drawn!");
+				winnerText.textContent = `Round Drawn!`;
+				WD.showModal();
+				gameBoard.reset();
+				gameBoard.showBoard();
+
+				playRound(player1, player2, !p1turn);
+				return;
+			}
+
+			p1turn = !p1turn; // switch player for next click
+		});
+	});
+}
+
+function closeWD() {
+	const WD = document.querySelector("#winner");
+	WD.close();
+}
+
+function closeFD() {
+	const FD = document.querySelector("#final");
+	FD.close();
+	window.location.reload();
 }
